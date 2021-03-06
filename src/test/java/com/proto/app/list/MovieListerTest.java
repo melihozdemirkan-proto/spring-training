@@ -1,4 +1,4 @@
-package com.proto.app;
+package com.proto.app.list;
 
 import com.proto.app.find.InMemoryMovieFinder;
 import com.proto.app.find.MovieFinder;
