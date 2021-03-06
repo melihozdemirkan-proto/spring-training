@@ -1,5 +1,6 @@
 package com.proto.app;
 
+import com.proto.app.find.FileMovieFinder;
 import com.proto.app.find.InMemoryMovieFinder;
 import com.proto.app.find.MovieFinder;
 import com.proto.app.model.Movie;
@@ -33,14 +34,16 @@ public class MovieLister {
 
     private static MovieLister initMovieLister() {
         //Prepare movies
+        /*
         List movies = List.of(
                 new Movie("Hugo", "Scorsese"),
                 new Movie("Silence", "Scorsese"),
                 new Movie("Kill Bill", "Tarantino"),
                 new Movie("Pulp Fiction", "Tarantino")
         );
+         */
 
-        MovieFinder movieFinder = new InMemoryMovieFinder(movies);
+        MovieFinder movieFinder = new FileMovieFinder("movies.txt");
 
         return new MovieLister(movieFinder);
     }
