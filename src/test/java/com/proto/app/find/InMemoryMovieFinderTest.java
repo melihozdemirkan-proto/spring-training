@@ -21,10 +21,12 @@ public class InMemoryMovieFinderTest {
                 new Movie("Pulp Fiction", "Tarantino")
         );
 
-        movieFinder = new InMemoryMovieFinder(movies);
+        int pagedMovieCountOnFile = 2;
+
+        movieFinder = new InMemoryMovieFinder(movies,2);
         //when
 
         //then
-        assertEquals(movies.size(), movieFinder.findAll().size());
+        assertEquals(pagedMovieCountOnFile, movieFinder.findAll().size());
     }
 }

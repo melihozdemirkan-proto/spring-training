@@ -43,7 +43,7 @@ public class MovieLister {
         );
          */
 
-        MovieFinder movieFinder = new FileMovieFinder("movies.txt");
+        MovieFinder movieFinder = new FileMovieFinder("movies.txt",4);
 
         return new MovieLister(movieFinder);
     }

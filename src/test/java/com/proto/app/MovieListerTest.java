@@ -27,7 +27,7 @@ public class MovieListerTest {
                 new Movie("Hugo", "Scorsese"),
                 new Movie("Silence", "Scorsese")
         );
-        movieFinder = new InMemoryMovieFinder(movies);
+        movieFinder = new InMemoryMovieFinder(movies,4);
         movieLister = new MovieLister(movieFinder);
         //when
         //then

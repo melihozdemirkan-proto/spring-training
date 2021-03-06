@@ -11,12 +11,12 @@ public class FileMovieFinderTest {
     @Test
     public void findAllReturnsMovieList(){
         //given
-        int movieCountOnFile = 4;
+        int pagedMovieCountOnFile = 2;
 
-        movieFinder = new FileMovieFinder("movies.txt");
+        movieFinder = new FileMovieFinder("movies.txt",2);
         //when
 
         //then
-        assertEquals(movieCountOnFile, movieFinder.findAll().size());
+        assertEquals(pagedMovieCountOnFile, movieFinder.findAll().size());
     }
 }
