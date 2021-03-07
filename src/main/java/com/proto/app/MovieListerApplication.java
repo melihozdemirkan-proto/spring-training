@@ -1,29 +1,25 @@
 package com.proto.app;
 
-import com.proto.app.find.FileMovieFinder;
-import com.proto.app.find.InMemoryMovieFinder;
-import com.proto.app.find.MovieFinder;
-import com.proto.app.list.MovieLister;
 import com.proto.app.model.Movie;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import com.proto.app.service.find.FileMovieFinder;
+import com.proto.app.service.find.InMemoryMovieFinder;
+import com.proto.app.service.find.MovieFinder;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
 @Configuration
-@ComponentScan(basePackageClasses = MovieListerApplication.class)
+//@EnableAutoConfiguration
+//@ComponentScan(basePackageClasses = MovieListerApplication.class)
+@SpringBootApplication
 public class MovieListerApplication {
 
     public static void main(String[] args) {
-        ApplicationContext context = new AnnotationConfigApplicationContext(MovieListerApplication.class);
-
-        MovieLister movieLister = (MovieLister) context.getBean("movieLister");
-        movieLister.moviesDirectedBy("Tarantino").forEach(System.out::println);
+        SpringApplication.run(MovieListerApplication.class, args);
     }
-
 
     @Bean
     public MovieFinder fileMovieFinder() {

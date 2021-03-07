@@ -1,17 +1,17 @@
-package com.proto.app.list;
+package com.proto.app.service;
 
-import com.proto.app.find.InMemoryMovieFinder;
-import com.proto.app.find.MovieFinder;
 import com.proto.app.model.Movie;
+import com.proto.app.service.find.InMemoryMovieFinder;
+import com.proto.app.service.find.MovieFinder;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class MovieListerTest {
+public class MovieServiceTest {
 
-    private MovieLister movieLister;
+    private MovieService movieService;
     private MovieFinder movieFinder;
 
     @Test
@@ -28,10 +28,10 @@ public class MovieListerTest {
                 new Movie("Silence", "Scorsese")
         );
         movieFinder = new InMemoryMovieFinder(movies,4);
-        movieLister = new MovieLister(movieFinder);
+        movieService = new MovieService(movieFinder);
         //when
         //then
-        assertEquals(movieLister.moviesDirectedBy("Scorsese").size(), scorseseMovies.size());
+        assertEquals(movieService.moviesDirectedBy("Scorsese").size(), scorseseMovies.size());
 
     }
 }

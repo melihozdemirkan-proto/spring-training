@@ -1,5 +1,7 @@
-package com.proto.app.find;
+package com.proto.app.service.find;
 
+import com.proto.app.service.find.FileMovieFinder;
+import com.proto.app.service.find.MovieFinder;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.assertEquals;

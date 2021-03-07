@@ -1,4 +1,4 @@
-package com.proto.app.find;
+package com.proto.app.service.find;
 
 import com.proto.app.model.Movie;
 import org.junit.jupiter.api.Test;
