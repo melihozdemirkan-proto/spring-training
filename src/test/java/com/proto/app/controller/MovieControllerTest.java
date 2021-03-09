@@ -2,7 +2,7 @@ package com.proto.app.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.proto.app.model.CreateMovieRequest;
-import com.proto.app.model.Movie;
+import com.proto.app.model.GenericResponse;
 import com.proto.app.model.PatchMovieRequest;
 import com.proto.app.model.UpdateMovieRequest;
 import org.junit.jupiter.api.Test;
@@ -11,6 +11,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
+import java.util.Map;
 
 import static com.proto.app.TestHelper.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -41,7 +44,7 @@ public class MovieControllerTest {
         mvc.perform(get("/movies?director=tarantino"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].director").value("Tarantino"));
+                .andExpect(jsonPath("$.data.[0].director").value("Tarantino"));
     }
 
 
@@ -50,7 +53,7 @@ public class MovieControllerTest {
         mvc.perform(get("/movies/?name=hugo"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Hugo"));
+                .andExpect(jsonPath("$.data.[0].name").value("Hugo"));
     }
 
     @Test
@@ -201,13 +204,13 @@ public class MovieControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        Movie[] movies = mapper.readValue(responseJson, Movie[].class);
-
+        GenericResponse<List> movies = mapper.readValue(responseJson, GenericResponse.class);
 
         mvc.perform(
-                delete("/movies/"+movies[0].getId()))
+                delete("/movies/"+((Map) movies.getData().get(0)).get("id")))
                 .andDo(print())
                 .andExpect(status().isOk());
+
     }
 
     @Test

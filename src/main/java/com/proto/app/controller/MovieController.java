@@ -1,10 +1,7 @@
 package com.proto.app.controller;
 
 import com.proto.app.exception.BusinessException;
-import com.proto.app.model.CreateMovieRequest;
-import com.proto.app.model.Movie;
-import com.proto.app.model.PatchMovieRequest;
-import com.proto.app.model.UpdateMovieRequest;
+import com.proto.app.model.*;
 import com.proto.app.service.MovieService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -24,13 +21,13 @@ public class MovieController {
     private final static String uuidRegex = "([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})";
 
     @GetMapping("movies")
-    List<Movie> getMoviesBy(@RequestParam(required = false) String director, @RequestParam(required = false) String name) {
-        return movieService.moviesByDirectorAndName(director, name);
+    GenericResponse<List<Movie>> getMoviesBy(@RequestParam(required = false) String director, @RequestParam(required = false) String name) {
+        return new GenericResponse<>(movieService.moviesByDirectorAndName(director, name),null);
     }
 
     @GetMapping("movies/{id}")
-    Movie getMoviesById(@PathVariable(required = false)  @Pattern(regexp = uuidRegex) String id) throws BusinessException {
-        return movieService.moviesById(id).get();
+    GenericResponse<Movie> getMoviesById(@PathVariable(required = false)  @Pattern(regexp = uuidRegex) String id) throws BusinessException {
+        return new GenericResponse<Movie>(movieService.moviesById(id).get(),null);
     }
 
     @PostMapping("movies")

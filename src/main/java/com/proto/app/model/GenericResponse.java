@@ -3,8 +3,8 @@ package com.proto.app.model;
 import lombok.Data;
 
 @Data
-public class GenericResponse {
-    private final Object data;
+public class GenericResponse<T> {
+    private final T data;
     private final String errorCode;
 
 }
