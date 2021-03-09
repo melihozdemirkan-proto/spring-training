@@ -1,5 +1,7 @@
 package com.proto.app.repository;
 
+import com.proto.app.exception.BusinessException;
+import com.proto.app.exception.ErrorType;
 import com.proto.app.model.Movie;
 
 import java.util.List;
@@ -22,9 +24,10 @@ public interface MovieRepository {
         return findByAnd(x -> x.getId().equalsIgnoreCase(id)).findFirst();
     }
 
-    default void deleteById(String id) {
+    default void deleteById(String id) throws BusinessException {
         List<Movie> movies = findAll();
-        findByAnd(x -> x.getId().equalsIgnoreCase(id)).findFirst().ifPresent(movies::remove);
+        Movie movie = findByAnd(x -> x.getId().equalsIgnoreCase(id)).findFirst().orElseThrow(()-> new BusinessException(ErrorType.NOT_FOUND));
+        movies.remove(movie);
     }
 
     default List<Movie> findByDirectorAndName(String director, String name) {

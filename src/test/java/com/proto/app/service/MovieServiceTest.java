@@ -1,5 +1,7 @@
 package com.proto.app.service;
 
+import com.proto.app.exception.BusinessException;
+import com.proto.app.exception.ErrorType;
 import com.proto.app.model.CreateMovieRequest;
 import com.proto.app.model.Movie;
 import com.proto.app.model.PatchMovieRequest;
@@ -16,10 +18,10 @@ import java.util.List;
 
 import static com.proto.app.TestHelper.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @TestInstance(Lifecycle.PER_CLASS)
 public class MovieServiceTest {
-
 
     private MovieService movieService;
     private MovieRepository movieRepository;
@@ -61,7 +63,7 @@ public class MovieServiceTest {
     }
 
     @Test
-    public void moviesByIdSuccess() {
+    public void moviesByIdSuccess() throws BusinessException {
         //given
         //when
         //then
@@ -70,7 +72,7 @@ public class MovieServiceTest {
     }
 
     @Test
-    public void createMovieSuccess() {
+    public void createMovieSuccess() throws BusinessException {
         //given
         CreateMovieRequest createMovieRequest = new CreateMovieRequest("Kill Bill 2", "Tarantino", false);
         int existingSize = movieRepository.findAll().size();
@@ -82,7 +84,7 @@ public class MovieServiceTest {
     }
 
     @Test
-    public void updateMovieSuccess() {
+    public void updateMovieSuccess() throws BusinessException {
         //given
         UpdateMovieRequest updateMovieRequest = new UpdateMovieRequest("Hugo", "Scorsese", true);
         //when
@@ -93,7 +95,19 @@ public class MovieServiceTest {
     }
 
     @Test
-    public void patchMovieSuccess() {
+    public void updateMovieReturnsNotFound() throws BusinessException {
+        //given
+        UpdateMovieRequest updateMovieRequest = new UpdateMovieRequest("Hugo", "Scorsese", true);
+        //when
+        //then
+
+        BusinessException exception = assertThrows(BusinessException.class, ()->movieService.updateMovie(NA_ID, updateMovieRequest));
+        assertEquals(ErrorType.NOT_FOUND, exception.getErrorType());
+
+    }
+
+    @Test
+    public void patchMovieSuccess() throws BusinessException {
         //given
         PatchMovieRequest patchMovieRequest = new PatchMovieRequest(null,null, true);
         //when
@@ -102,9 +116,17 @@ public class MovieServiceTest {
         assertEquals(movieRepository.findById(HUGO_ID).get().isWatched(), patchMovieRequest.isWatched());
 
     }
-
     @Test
-    public void deleteMovieSuccess() {
+    public void patchMovieReturnsNotFound() throws BusinessException {
+        //given
+        PatchMovieRequest patchMovieRequest = new PatchMovieRequest(null,null, true);
+        //when
+        //then
+        BusinessException exception = assertThrows(BusinessException.class, ()->movieService.patchMovie(NA_ID, patchMovieRequest));
+        assertEquals(ErrorType.NOT_FOUND, exception.getErrorType());
+
+    }
+    public void deleteMovieSuccess() throws BusinessException {
         //given
         int existingSize = movieRepository.findAll().size();
         CreateMovieRequest createMovieRequest = new CreateMovieRequest("Kill Bill 3", "Tarantino", false);
@@ -116,5 +138,14 @@ public class MovieServiceTest {
 
         movieService.deleteMovie(existingId);
         assertEquals(movieRepository.findAll().size(), existingSize);
+    }
+
+    @Test
+    public void deleteMovieReturnsNotFound() throws BusinessException {
+        //given
+        //when
+        //then
+        BusinessException exception = assertThrows(BusinessException.class, ()->movieService.deleteMovie(NA_ID));
+        assertEquals(ErrorType.NOT_FOUND, exception.getErrorType());
     }
 }

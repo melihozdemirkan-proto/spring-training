@@ -1,5 +1,6 @@
 package com.proto.app.controller;
 
+import com.proto.app.exception.BusinessException;
 import com.proto.app.model.CreateMovieRequest;
 import com.proto.app.model.Movie;
 import com.proto.app.model.PatchMovieRequest;
@@ -22,27 +23,27 @@ public class MovieController {
     }
 
     @GetMapping("movies/{id}")
-    Movie getMoviesById(@PathVariable(required = false) String id) {
+    Movie getMoviesById(@PathVariable(required = false) String id) throws BusinessException {
         return movieService.moviesById(id).get();
     }
 
     @PostMapping("movies")
-    void createMovie( @RequestBody CreateMovieRequest createMovieRequest) {
+    void createMovie( @RequestBody CreateMovieRequest createMovieRequest) throws BusinessException {
         movieService.createMovie(createMovieRequest);
     }
 
     @PutMapping("movies/{id}")
-    void updateMovie(@PathVariable String id, @RequestBody UpdateMovieRequest updateMovieRequest) {
+    void updateMovie(@PathVariable String id, @RequestBody UpdateMovieRequest updateMovieRequest) throws BusinessException {
         movieService.updateMovie(id, updateMovieRequest);
     }
 
     @PatchMapping("movies/{id}")
-    void patchMovie(@PathVariable String id, @RequestBody PatchMovieRequest patchMovieRequest) {
+    void patchMovie(@PathVariable String id, @RequestBody PatchMovieRequest patchMovieRequest) throws BusinessException {
         movieService.patchMovie(id, patchMovieRequest);
     }
 
     @DeleteMapping("movies/{id}")
-    void deleteMovie(@PathVariable String id) {
+    void deleteMovie(@PathVariable String id) throws BusinessException {
         movieService.deleteMovie(id);
     }
 }

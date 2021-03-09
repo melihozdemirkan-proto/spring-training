@@ -79,6 +79,18 @@ public class MovieControllerTest {
     }
 
     @Test
+    public void updateMovieReturnsNotFound() throws Exception {
+        UpdateMovieRequest updateMovieRequest = new UpdateMovieRequest("Hugo", "Scorsese", true);
+
+        mvc.perform(
+                put("/movies/"+NA_ID)
+                        .content(mapper.writeValueAsString(updateMovieRequest))
+                        .header(HttpHeaders.CONTENT_TYPE, "application/json"))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     public void patchMovieSuccess() throws Exception {
         PatchMovieRequest patchMovieRequest = new PatchMovieRequest(null,null, true);
 
@@ -89,6 +101,19 @@ public class MovieControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
     }
+
+    @Test
+    public void patchMovieReturnsNotFound() throws Exception {
+        PatchMovieRequest patchMovieRequest = new PatchMovieRequest(null,null, true);
+
+        mvc.perform(
+                patch("/movies/"+NA_ID)
+                        .content(mapper.writeValueAsString(patchMovieRequest))
+                        .header(HttpHeaders.CONTENT_TYPE, "application/json"))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
 
     @Test
     public void deleteMovieSuccess() throws Exception {
@@ -116,5 +141,14 @@ public class MovieControllerTest {
                 delete("/movies/"+movies[0].getId()))
                 .andDo(print())
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void deleteMovieReturnsNotFound() throws Exception {
+
+        mvc.perform(
+                delete("/movies/"+NA_ID))
+                .andDo(print())
+                .andExpect(status().isNotFound());
     }
 }
