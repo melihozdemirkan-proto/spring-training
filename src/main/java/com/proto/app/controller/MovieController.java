@@ -29,7 +29,7 @@ public class MovieController {
     }
 
     @GetMapping("movies/{id}")
-    Movie getMoviesById(@PathVariable(required = false) String id) throws BusinessException {
+    Movie getMoviesById(@PathVariable(required = false)  @Pattern(regexp = uuidRegex) String id) throws BusinessException {
         return movieService.moviesById(id).get();
     }
 
