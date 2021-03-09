@@ -1,5 +1,5 @@
 package com.proto.app.exception;
 
 public enum ErrorType {
-    CONFLICT, NOT_FOUND
+    CONFLICT, NOT_FOUND, BAD_REQUEST;
 }

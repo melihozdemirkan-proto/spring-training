@@ -65,6 +65,18 @@ public class MovieControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    public void createMovieReturnsBadRequest() throws Exception {
+        CreateMovieRequest createMovieRequest = new CreateMovieRequest("Kill Bill 2", "Tarantino", false);
+        createMovieRequest.setName(null);
+        mvc.perform(
+                post("/movies")
+                        .content(mapper.writeValueAsString(createMovieRequest))
+                        .header(HttpHeaders.CONTENT_TYPE, "application/json"))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
 
     @Test
     public void updateMovieSuccess() throws Exception {
@@ -91,6 +103,26 @@ public class MovieControllerTest {
     }
 
     @Test
+    public void updateMovieReturnsBadRequest() throws Exception {
+        UpdateMovieRequest updateMovieRequest = new UpdateMovieRequest("Hugo", "Scorsese", true);
+
+        mvc.perform(
+                put("/movies/"+INVALID_ID)
+                        .content(mapper.writeValueAsString(updateMovieRequest))
+                        .header(HttpHeaders.CONTENT_TYPE, "application/json"))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+        updateMovieRequest.setName(null);
+        mvc.perform(
+                put("/movies/"+INVALID_ID)
+                        .content(mapper.writeValueAsString(updateMovieRequest))
+                        .header(HttpHeaders.CONTENT_TYPE, "application/json"))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void patchMovieSuccess() throws Exception {
         PatchMovieRequest patchMovieRequest = new PatchMovieRequest(null,null, true);
 
@@ -113,11 +145,21 @@ public class MovieControllerTest {
                 .andDo(print())
                 .andExpect(status().isNotFound());
     }
+    @Test
+    public void patchMovieReturnsBadRequest() throws Exception {
+        PatchMovieRequest patchMovieRequest = new PatchMovieRequest(null,null, true);
 
+        mvc.perform(
+                patch("/movies/"+INVALID_ID)
+                        .content(mapper.writeValueAsString(patchMovieRequest))
+                        .header(HttpHeaders.CONTENT_TYPE, "application/json"))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
 
     @Test
     public void deleteMovieSuccess() throws Exception {
-        CreateMovieRequest createMovieRequest = new CreateMovieRequest("Kill Bill 2", "Tarantino", false);
+        CreateMovieRequest createMovieRequest = new CreateMovieRequest("Kill Bill 3", "Tarantino", false);
         //create
         mvc.perform(
                 post("/movies")
@@ -128,7 +170,7 @@ public class MovieControllerTest {
         //get
 
         String responseJson = mvc.perform(
-                get("/movies/?name=kill bill 2")
+                get("/movies/?name=kill bill 3")
                         .content(mapper.writeValueAsString(createMovieRequest))
                         .header(HttpHeaders.CONTENT_TYPE, "application/json"))
                 .andDo(print())
@@ -150,5 +192,15 @@ public class MovieControllerTest {
                 delete("/movies/"+NA_ID))
                 .andDo(print())
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void deleteMovieReturnsBadRequest() throws Exception {
+
+        mvc.perform(
+                delete("/movies/"+INVALID_ID))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
     }
 }

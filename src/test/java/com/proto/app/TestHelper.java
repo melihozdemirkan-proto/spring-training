@@ -1,6 +1,7 @@
 package com.proto.app;
 
 public class TestHelper {
+    public static final String INVALID_ID = "2783ef5b-27e2-41d6-9da4-13e121160e3";
     public static final String NA_ID = "2783ef5b-27e2-41d6-9da4-13e121160e36";
     public static final String KILL_BILL_ID = "a825a9e5-c451-4fd2-8ed0-f868fb376a40";
     public static final String HUGO_ID = "489174a0-b30f-4c1c-a963-6339706ac2a6";
