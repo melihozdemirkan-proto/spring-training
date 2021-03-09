@@ -1,6 +1,8 @@
 logging:
+
   level:
     root: INFO
     org.springframework: INFO
     com.proto: INFO
-
+app:
+  max-movie-per-director: 4

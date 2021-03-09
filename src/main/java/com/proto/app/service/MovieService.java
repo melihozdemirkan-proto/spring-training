@@ -8,6 +8,7 @@ import com.proto.app.model.PatchMovieRequest;
 import com.proto.app.model.UpdateMovieRequest;
 import com.proto.app.repository.MovieRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -18,6 +19,8 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 public class MovieService {
+    @Value("${app.max-movie-per-director}")
+    String maxMoviePerService;
     private final MovieRepository movieRepository;
 
     public List<Movie> moviesByDirectorAndName(String director, String name) {
@@ -33,6 +36,10 @@ public class MovieService {
     public void createMovie(CreateMovieRequest createMovieRequest) throws BusinessException {
         if(!movieRepository.findByDirectorAndName(createMovieRequest.getDirector(),createMovieRequest.getName()).isEmpty()){
             throw new BusinessException(ErrorType.CONFLICT);
+        }
+
+        if (movieRepository.findByDirectorAndName(createMovieRequest.getDirector(), null).size() == Integer.valueOf(maxMoviePerService)) {
+            throw new BusinessException(ErrorType.MAX_MOVIE_PER_DIRECTOR);
         }
         Movie movie = new Movie(UUID.randomUUID().toString(), createMovieRequest.getName(), createMovieRequest.getDirector(), createMovieRequest.isWatched());
         movieRepository.save(movie);

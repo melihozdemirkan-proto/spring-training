@@ -67,8 +67,7 @@ public class MovieControllerTest {
 
     @Test
     public void createMovieReturnsBadRequest() throws Exception {
-        CreateMovieRequest createMovieRequest = new CreateMovieRequest("Kill Bill 2", "Tarantino", false);
-        createMovieRequest.setName(null);
+        CreateMovieRequest createMovieRequest = new CreateMovieRequest(null, "Tarantino", false);
         mvc.perform(
                 post("/movies")
                         .content(mapper.writeValueAsString(createMovieRequest))
@@ -77,6 +76,32 @@ public class MovieControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    public void createMovieReturnsConflict() throws Exception {
+        CreateMovieRequest createMovieRequest = new CreateMovieRequest("Matrix", "Wachowski Brothers", false);
+        //1st
+        mvc.perform(post("/movies").content(mapper.writeValueAsString(createMovieRequest)).header(HttpHeaders.CONTENT_TYPE, "application/json"))
+                .andDo(print())
+                .andExpect(status().isOk());
+        //2nd
+        mvc.perform(post("/movies").content(mapper.writeValueAsString(createMovieRequest.withName("Matrix Reloaded"))).header(HttpHeaders.CONTENT_TYPE, "application/json"))
+                .andDo(print())
+                .andExpect(status().isOk());
+        //3rd
+        mvc.perform(post("/movies").content(mapper.writeValueAsString(createMovieRequest.withName("Matrix Revolutions"))).header(HttpHeaders.CONTENT_TYPE, "application/json"))
+                .andDo(print())
+                .andExpect(status().isOk());
+        //4th
+        mvc.perform(post("/movies").content(mapper.writeValueAsString(createMovieRequest.withName("Matrix 4"))).header(HttpHeaders.CONTENT_TYPE, "application/json"))
+                .andDo(print())
+                .andExpect(status().isOk());
+        //4th
+        mvc.perform(post("/movies").content(mapper.writeValueAsString(createMovieRequest.withName("Sense 8"))).header(HttpHeaders.CONTENT_TYPE, "application/json"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errorCode").value("MAX_MOVIE_PER_DIRECTOR"));
+
+    }
 
     @Test
     public void updateMovieSuccess() throws Exception {

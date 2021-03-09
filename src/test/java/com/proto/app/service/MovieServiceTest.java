@@ -28,6 +28,7 @@ public class MovieServiceTest {
 
     @BeforeAll
     public void init() {
+
         List movies = new ArrayList(List.of(
                 new Movie(HUGO_ID, "Hugo", "Scorsese", false),
                 new Movie(SILENCE_ID, "Silence", "Scorsese", false),
@@ -37,6 +38,7 @@ public class MovieServiceTest {
 
         movieRepository = new InMemoryMovieRepository(movies);
         movieService = new MovieService(movieRepository);
+        movieService.maxMoviePerService="4";
     }
 
 
@@ -80,6 +82,35 @@ public class MovieServiceTest {
         //then
         movieService.createMovie(createMovieRequest);
         assertEquals(movieRepository.findAll().size(), existingSize+1);
+
+    }
+
+    @Test
+    public void createMovieReturnsConflict() throws BusinessException {
+        //given
+        CreateMovieRequest createMovieRequest = new CreateMovieRequest("Psycho", "Hitchcock", false);
+        //when
+        //then
+        movieService.createMovie(createMovieRequest);
+        //Attemt to create 4th movie returns business error
+        BusinessException exception = assertThrows(BusinessException.class, ()->movieService.createMovie(createMovieRequest));
+        assertEquals(ErrorType.CONFLICT, exception.getErrorType());
+
+    }
+
+    @Test
+    public void createMovieReturnsMaxMoviePerDirector() throws BusinessException {
+        //given
+        CreateMovieRequest createMovieRequest = new CreateMovieRequest("Distant", "Ceylan", false);
+        //when
+        //then
+        movieService.createMovie(createMovieRequest);
+        movieService.createMovie(createMovieRequest.withName("Three Monkeys"));
+        movieService.createMovie(createMovieRequest.withName("Small Town"));
+        movieService.createMovie(createMovieRequest.withName("Winter Sleep"));
+        //Attemt to create 4th movie returns business error
+        BusinessException exception = assertThrows(BusinessException.class, ()->movieService.createMovie(createMovieRequest.withName("The Wild Pear Tree")));
+        assertEquals(ErrorType.MAX_MOVIE_PER_DIRECTOR, exception.getErrorType());
 
     }
 
