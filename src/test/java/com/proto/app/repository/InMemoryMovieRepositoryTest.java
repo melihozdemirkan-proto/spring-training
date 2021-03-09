@@ -15,10 +15,10 @@ public class InMemoryMovieRepositoryTest {
     public void findAllReturnsMovieList(){
         //given
         List movies = List.of(
-                new Movie("Hugo", "Scorsese"),
-                new Movie("Silence", "Scorsese"),
-                new Movie("Kill Bill", "Tarantino"),
-                new Movie("Pulp Fiction", "Tarantino")
+                new Movie("Hugo", "Scorsese",false),
+                new Movie("Silence", "Scorsese",false),
+                new Movie("Kill Bill", "Tarantino",false),
+                new Movie("Pulp Fiction", "Tarantino",false)
         );
 
         int movieCountOnFile = 4;

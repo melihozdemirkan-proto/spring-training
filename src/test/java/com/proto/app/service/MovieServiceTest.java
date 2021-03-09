@@ -18,14 +18,14 @@ public class MovieServiceTest {
     public void moviesDirectedByReturnsDirectorsMovies() {
         //given
         List movies = List.of(
-                new Movie("Hugo", "Scorsese"),
-                new Movie("Silence", "Scorsese"),
-                new Movie("Kill Bill", "Tarantino"),
-                new Movie("Pulp Fiction", "Tarantino")
+                new Movie("Hugo", "Scorsese",false),
+                new Movie("Silence", "Scorsese",false),
+                new Movie("Kill Bill", "Tarantino",false),
+                new Movie("Pulp Fiction", "Tarantino",false)
         );
         List scorseseMovies = List.of(
-                new Movie("Hugo", "Scorsese"),
-                new Movie("Silence", "Scorsese")
+                new Movie("Hugo", "Scorsese",false),
+                new Movie("Silence", "Scorsese",false)
         );
         movieRepository = new InMemoryMovieRepository(movies);
         movieService = new MovieService(movieRepository);

@@ -2,18 +2,16 @@ package com.proto.app.controller;
 
 import com.proto.app.model.Movie;
 import com.proto.app.service.MovieService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/")
 public class MovieController {
-    private MovieService movieService;
-
-    public MovieController(MovieService movieService) {
-        this.movieService = movieService;
-    }
+    private final MovieService movieService;
 
     @GetMapping("movies")
     List<Movie> getMoviesByDirector(@RequestParam(required = false) String director) {
