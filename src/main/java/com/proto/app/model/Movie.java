@@ -2,6 +2,10 @@ package com.proto.app.model;
 
 public class Movie {
 
+    public String getName() {
+        return name;
+    }
+
     private String name;
 
     public String getDirector() {

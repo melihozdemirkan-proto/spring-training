@@ -1,9 +1,9 @@
 package com.proto.app;
 
 import com.proto.app.model.Movie;
-import com.proto.app.service.find.FileMovieFinder;
-import com.proto.app.service.find.InMemoryMovieFinder;
-import com.proto.app.service.find.MovieFinder;
+import com.proto.app.repository.FileMovieRepository;
+import com.proto.app.repository.InMemoryMovieRepository;
+import com.proto.app.repository.MovieRepository;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -12,8 +12,6 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 @Configuration
-//@EnableAutoConfiguration
-//@ComponentScan(basePackageClasses = MovieListerApplication.class)
 @SpringBootApplication
 public class MovieListerApplication {
 
@@ -22,18 +20,18 @@ public class MovieListerApplication {
     }
 
     @Bean
-    public MovieFinder fileMovieFinder() {
-        return new FileMovieFinder("movies.txt", 4);
+    public MovieRepository fileMovieRepository() {
+        return new FileMovieRepository("movies.txt");
     }
 
     @Bean
-    public MovieFinder inMemoryMovieFinder() {
-        return new InMemoryMovieFinder(List.of(
+    public MovieRepository inMemoryMovieRepository() {
+        return new InMemoryMovieRepository(List.of(
                 new Movie("Hugo", "Scorsese"),
                 new Movie("Silence", "Scorsese"),
                 new Movie("Kill Bill", "Tarantino"),
                 new Movie("Pulp Fiction", "Tarantino")
-        ), 4);
+        ));
     }
 
 }

@@ -1,4 +1,4 @@
-package com.proto.app.service.find;
+package com.proto.app.repository;
 
 import com.proto.app.model.Movie;
 import org.junit.jupiter.api.Test;
@@ -7,9 +7,9 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class InMemoryMovieFinderTest {
+public class InMemoryMovieRepositoryTest {
 
-    private MovieFinder movieFinder;
+    private MovieRepository movieRepository;
 
     @Test
     public void findAllReturnsMovieList(){
@@ -21,12 +21,12 @@ public class InMemoryMovieFinderTest {
                 new Movie("Pulp Fiction", "Tarantino")
         );
 
-        int pagedMovieCountOnFile = 2;
+        int movieCountOnFile = 4;
 
-        movieFinder = new InMemoryMovieFinder(movies,2);
+        movieRepository = new InMemoryMovieRepository(movies);
         //when
 
         //then
-        assertEquals(pagedMovieCountOnFile, movieFinder.findAll().size());
+        assertEquals(movieCountOnFile, movieRepository.findAll().size());
     }
 }

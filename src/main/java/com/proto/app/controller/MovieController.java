@@ -1,10 +1,8 @@
 package com.proto.app.controller;
 
-import com.proto.app.service.MovieService;
 import com.proto.app.model.Movie;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.proto.app.service.MovieService;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -12,14 +10,18 @@ import java.util.List;
 @RequestMapping("/")
 public class MovieController {
     private MovieService movieService;
+
     public MovieController(MovieService movieService) {
         this.movieService = movieService;
     }
 
     @GetMapping("movies")
-    List<Movie> getMovies(){
-        //return movieLister.moviesDirectedBy(null).stream().map(Movie::toString).collect(Collectors.joining(","));
-        return movieService.moviesDirectedBy(null);
+    List<Movie> getMoviesByDirector(@RequestParam(required = false) String director) {
+        return movieService.moviesByDirector(director, 10);
     }
 
+    @GetMapping("movies/{name}")
+    List<Movie> getMoviesByName(@PathVariable(required = false) String name) {
+        return movieService.moviesByName(name, 10);
+    }
 }

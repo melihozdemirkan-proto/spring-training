@@ -1,4 +1,4 @@
-package com.proto.app.service.find;
+package com.proto.app.repository;
 
 import com.proto.app.model.Movie;
 
@@ -6,14 +6,11 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class FileMovieFinder implements MovieFinder {
+public class FileMovieRepository implements MovieRepository {
     private List<Movie> movies;
-    private int pageSize;
 
-    public FileMovieFinder(String fileName,int pageSize) {
-        this.pageSize = pageSize;
+    public FileMovieRepository(String fileName) {
         this.movies = new ArrayList<>();
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream(fileName)));
@@ -30,6 +27,7 @@ public class FileMovieFinder implements MovieFinder {
 
     @Override
     public List<Movie> findAll() {
-        return movies.stream().limit(pageSize).collect(Collectors.toList());
+        return movies;
     }
+
 }
