@@ -1,46 +1,43 @@
 package com.proto.app.service;
 
+import com.proto.app.entity.Movie;
 import com.proto.app.exception.BusinessException;
 import com.proto.app.exception.ErrorType;
 import com.proto.app.model.CreateMovieRequest;
-import com.proto.app.model.Movie;
 import com.proto.app.model.PatchMovieRequest;
 import com.proto.app.model.UpdateMovieRequest;
-import com.proto.app.repository.InMemoryMovieRepository;
 import com.proto.app.repository.MovieRepository;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.EmptyResultDataAccessException;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.proto.app.TestHelper.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@TestInstance(Lifecycle.PER_CLASS)
+@ExtendWith(MockitoExtension.class)
 public class MovieServiceTest {
 
+    @InjectMocks
     private MovieService movieService;
+
+    @Mock
     private MovieRepository movieRepository;
 
-    @BeforeAll
+    @BeforeEach
     public void init() {
-
-        List movies = new ArrayList(List.of(
-                new Movie(HUGO_ID, "Hugo", "Scorsese", false),
-                new Movie(SILENCE_ID, "Silence", "Scorsese", false),
-                new Movie(KILL_BILL_ID, "Kill Bill", "Tarantino", false),
-                new Movie(PULP_FICTION_ID, "Pulp Fiction", "Tarantino", false)
-        ));
-
-        movieRepository = new InMemoryMovieRepository(movies);
-        movieService = new MovieService(movieRepository);
-        movieService.maxMoviePerService="4";
+        movieService.maxMoviePerService = "4";
     }
-
 
     @Test
     public void moviesByDirectorSuccess() {
@@ -50,24 +47,32 @@ public class MovieServiceTest {
                 new Movie(SILENCE_ID, "Silence", "Scorsese", false)
         );
         //when
+        when(movieRepository.findByDirectorAndName("Scorsese",null)).thenReturn(scorseseMovies);
         //then
-        assertEquals(movieService.moviesByDirectorAndName("Scorsese", null).size(), scorseseMovies.size());
+        //assertEquals(movieService.moviesByDirectorAndName("Scorsese", null).size(), scorseseMovies.size());
+        movieService.moviesByDirectorAndName("Scorsese", null);
+        verify(movieRepository).findByDirectorAndName("Scorsese",null);
 
     }
 
     @Test
     public void moviesByNameSuccess() {
         //given
+        Movie movie = new Movie(HUGO_ID, "Hugo", "Scorsese", false);
         //when
+        when(movieRepository.findByDirectorAndName(null,"Hugo")).thenReturn(List.of(movie));
         //then
-        assertEquals(movieService.moviesByDirectorAndName(null, "Hugo").size(), 1);
-
+        //assertEquals(movieService.moviesByDirectorAndName(null, "Hugo").size(), 1);
+        movieService.moviesByDirectorAndName(null, "Hugo");
+        verify(movieRepository).findByDirectorAndName(null,"Hugo");
     }
 
     @Test
     public void moviesByIdSuccess() throws BusinessException {
         //given
+        Movie movie = new Movie(HUGO_ID, "Hugo", "Scorsese", false);
         //when
+        when(movieRepository.findById(any())).thenReturn(Optional.of(movie));
         //then
         assertEquals(movieService.moviesById(HUGO_ID).get().getId(), HUGO_ID);
 
@@ -77,11 +82,11 @@ public class MovieServiceTest {
     public void createMovieSuccess() throws BusinessException {
         //given
         CreateMovieRequest createMovieRequest = new CreateMovieRequest("Kill Bill 2", "Tarantino", false);
-        int existingSize = movieRepository.findAll().size();
         //when
+        when(movieRepository.findByDirectorAndName(createMovieRequest.getDirector(),createMovieRequest.getName())).thenReturn(List.of());
         //then
         movieService.createMovie(createMovieRequest);
-        assertEquals(movieRepository.findAll().size(), existingSize+1);
+        verify(movieRepository).save(any(Movie.class));
 
     }
 
@@ -89,13 +94,12 @@ public class MovieServiceTest {
     public void createMovieReturnsConflict() throws BusinessException {
         //given
         CreateMovieRequest createMovieRequest = new CreateMovieRequest("Psycho", "Hitchcock", false);
+        Movie movie = new Movie(HUGO_ID, "Hugo", "Scorsese", false);
         //when
+        when(movieRepository.findByDirectorAndName(createMovieRequest.getDirector(),createMovieRequest.getName())).thenReturn(List.of(movie));
         //then
-        movieService.createMovie(createMovieRequest);
-        //Attemt to create 4th movie returns business error
         BusinessException exception = assertThrows(BusinessException.class, ()->movieService.createMovie(createMovieRequest));
         assertEquals(ErrorType.CONFLICT, exception.getErrorType());
-
     }
 
     @Test
@@ -103,13 +107,19 @@ public class MovieServiceTest {
         //given
         CreateMovieRequest createMovieRequest = new CreateMovieRequest("Distant", "Ceylan", false);
         //when
+        when(movieRepository.findByDirectorAndName(createMovieRequest.getDirector(),createMovieRequest.getName())).thenReturn(List.of());
+        when(movieRepository.findByDirectorAndName(createMovieRequest.getDirector(), null))
+                .thenReturn(List.of(
+                        new Movie(HUGO_ID, "Three Monkeys", "Ceylan", false),
+                        new Movie(SILENCE_ID, "Small Town", "Ceylan", false),
+                        new Movie(KILL_BILL_ID, "Winter Sleep", "Ceylan", false),
+                        new Movie(PULP_FICTION_ID, "The Wild Pear Tree", "Ceylan", false)
+                )
+        );
+
         //then
-        movieService.createMovie(createMovieRequest);
-        movieService.createMovie(createMovieRequest.withName("Three Monkeys"));
-        movieService.createMovie(createMovieRequest.withName("Small Town"));
-        movieService.createMovie(createMovieRequest.withName("Winter Sleep"));
-        //Attemt to create 4th movie returns business error
-        BusinessException exception = assertThrows(BusinessException.class, ()->movieService.createMovie(createMovieRequest.withName("The Wild Pear Tree")));
+        //Attemt to create 5th movie returns business error
+        BusinessException exception = assertThrows(BusinessException.class, ()->movieService.createMovie(createMovieRequest));
         assertEquals(ErrorType.MAX_MOVIE_PER_DIRECTOR, exception.getErrorType());
 
     }
@@ -118,11 +128,13 @@ public class MovieServiceTest {
     public void updateMovieSuccess() throws BusinessException {
         //given
         UpdateMovieRequest updateMovieRequest = new UpdateMovieRequest("Hugo", "Scorsese", true);
+        Movie movie = new Movie(HUGO_ID, "Hugo", "Scorsese", false);
         //when
+        when(movieRepository.findById(HUGO_ID)).thenReturn(Optional.of(movie));
         //then
         movieService.updateMovie(HUGO_ID, updateMovieRequest);
-        assertEquals(movieRepository.findById(HUGO_ID).get().isWatched(), updateMovieRequest.isWatched());
-
+        movie.setWatched(true);
+        verify(movieRepository).save(movie);
     }
 
     @Test
@@ -130,8 +142,8 @@ public class MovieServiceTest {
         //given
         UpdateMovieRequest updateMovieRequest = new UpdateMovieRequest("Hugo", "Scorsese", true);
         //when
+        when(movieRepository.findById(NA_ID)).thenThrow(new EmptyResultDataAccessException(1));
         //then
-
         BusinessException exception = assertThrows(BusinessException.class, ()->movieService.updateMovie(NA_ID, updateMovieRequest));
         assertEquals(ErrorType.NOT_FOUND, exception.getErrorType());
 
@@ -141,10 +153,13 @@ public class MovieServiceTest {
     public void patchMovieSuccess() throws BusinessException {
         //given
         PatchMovieRequest patchMovieRequest = new PatchMovieRequest(null,null, true);
+        Movie movie = new Movie(HUGO_ID, "Hugo", "Scorsese", false);
         //when
+        when(movieRepository.findById(HUGO_ID)).thenReturn(Optional.of(movie));
         //then
         movieService.patchMovie(HUGO_ID, patchMovieRequest);
-        assertEquals(movieRepository.findById(HUGO_ID).get().isWatched(), patchMovieRequest.isWatched());
+        movie.setWatched(true);
+        verify(movieRepository).save(movie);
 
     }
     @Test
@@ -152,29 +167,29 @@ public class MovieServiceTest {
         //given
         PatchMovieRequest patchMovieRequest = new PatchMovieRequest(null,null, true);
         //when
+        when(movieRepository.findById(NA_ID)).thenThrow(new EmptyResultDataAccessException(1));
         //then
         BusinessException exception = assertThrows(BusinessException.class, ()->movieService.patchMovie(NA_ID, patchMovieRequest));
         assertEquals(ErrorType.NOT_FOUND, exception.getErrorType());
 
     }
+    @Test
     public void deleteMovieSuccess() throws BusinessException {
         //given
-        int existingSize = movieRepository.findAll().size();
-        CreateMovieRequest createMovieRequest = new CreateMovieRequest("Kill Bill 3", "Tarantino", false);
+        Movie movie = new Movie(HUGO_ID, "Hugo", "Scorsese", false);
         //when
+        when(movieRepository.findById(HUGO_ID)).thenReturn(Optional.of(movie));
         //then
-        movieService.createMovie(createMovieRequest);
-        String existingId = movieRepository.findByName("Kill Bill 3").get(0).getId();
-        assertEquals(movieRepository.findAll().size(), existingSize+1);
 
-        movieService.deleteMovie(existingId);
-        assertEquals(movieRepository.findAll().size(), existingSize);
+        movieService.deleteMovie(HUGO_ID);
+        verify(movieRepository).deleteById(HUGO_ID);
     }
 
     @Test
     public void deleteMovieReturnsNotFound() throws BusinessException {
         //given
         //when
+        when(movieRepository.findById(NA_ID)).thenThrow(new EmptyResultDataAccessException(1));
         //then
         BusinessException exception = assertThrows(BusinessException.class, ()->movieService.deleteMovie(NA_ID));
         assertEquals(ErrorType.NOT_FOUND, exception.getErrorType());

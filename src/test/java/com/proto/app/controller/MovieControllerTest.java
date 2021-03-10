@@ -41,7 +41,7 @@ public class MovieControllerTest {
     @Test
     public void getMoviesByDirectorSuccess() throws Exception {
 
-        mvc.perform(get("/movies?director=tarantino"))
+        mvc.perform(get("/movies?director=Tarantino"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.[0].director").value("Tarantino"));
@@ -50,7 +50,7 @@ public class MovieControllerTest {
 
     @Test
     public void getMoviesByNameSuccess() throws Exception {
-        mvc.perform(get("/movies/?name=hugo"))
+        mvc.perform(get("/movies/?name=Hugo"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.[0].name").value("Hugo"));
@@ -98,7 +98,7 @@ public class MovieControllerTest {
         mvc.perform(post("/movies").content(mapper.writeValueAsString(createMovieRequest.withName("Matrix 4"))).header(HttpHeaders.CONTENT_TYPE, "application/json"))
                 .andDo(print())
                 .andExpect(status().isOk());
-        //4th
+        //5th
         mvc.perform(post("/movies").content(mapper.writeValueAsString(createMovieRequest.withName("Sense 8"))).header(HttpHeaders.CONTENT_TYPE, "application/json"))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -198,7 +198,7 @@ public class MovieControllerTest {
         //get
 
         String responseJson = mvc.perform(
-                get("/movies/?name=kill bill 3")
+                get("/movies/?name=Kill Bill 3")
                         .content(mapper.writeValueAsString(createMovieRequest))
                         .header(HttpHeaders.CONTENT_TYPE, "application/json"))
                 .andDo(print())

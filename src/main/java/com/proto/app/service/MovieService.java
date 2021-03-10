@@ -1,14 +1,15 @@
 package com.proto.app.service;
 
+import com.proto.app.entity.Movie;
 import com.proto.app.exception.BusinessException;
 import com.proto.app.exception.ErrorType;
 import com.proto.app.model.CreateMovieRequest;
-import com.proto.app.model.Movie;
 import com.proto.app.model.PatchMovieRequest;
 import com.proto.app.model.UpdateMovieRequest;
 import com.proto.app.repository.MovieRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -47,7 +48,7 @@ public class MovieService {
     }
 
     public void updateMovie(String id, UpdateMovieRequest updateMovieRequest) throws BusinessException {
-        Movie movie = movieRepository.findById(id).orElseThrow(()->new BusinessException(ErrorType.NOT_FOUND));
+        Movie movie = checkIfMovieExists(id);
 
         movie.setDirector(updateMovieRequest.getDirector());
         movie.setName(updateMovieRequest.getName());
@@ -58,7 +59,7 @@ public class MovieService {
     }
 
     public void patchMovie(String id, PatchMovieRequest patchMovieRequest) throws BusinessException {
-        Movie movie = movieRepository.findById(id).orElseThrow(()->new BusinessException(ErrorType.NOT_FOUND));
+        Movie movie = checkIfMovieExists(id);
 
         if (StringUtils.hasLength(patchMovieRequest.getDirector())) {
             movie.setDirector(patchMovieRequest.getDirector());
@@ -75,9 +76,20 @@ public class MovieService {
     }
 
     public void deleteMovie(String id) throws BusinessException {
+        checkIfMovieExists(id);
         movieRepository.deleteById(id);
         printList();
 
+    }
+
+    private Movie checkIfMovieExists(String id) throws BusinessException {
+        Movie movie;
+        try {
+            movie = movieRepository.findById(id).get();
+        }catch (EmptyResultDataAccessException exception){
+            throw  new BusinessException(ErrorType.NOT_FOUND);
+        }
+        return movie;
     }
 
 

@@ -1,50 +1,76 @@
 package com.proto.app.repository;
 
+import com.proto.app.entity.Movie;
 import com.proto.app.exception.BusinessException;
-import com.proto.app.exception.ErrorType;
-import com.proto.app.model.Movie;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-public interface MovieRepository {
+@RequiredArgsConstructor
+@Repository
+public class MovieRepository {
+    @PersistenceContext
+    private final EntityManager entityManager;
 
-    default void save(Movie movie) {
-        List<Movie> movies = findAll();
-        movies.remove(movie);
-        movies.add(movie);
+    public List<Movie> findAll() {
+        String query = "from Movie";
+        TypedQuery<Movie> typedQuery = entityManager.createQuery(query, Movie.class);
+        return typedQuery.getResultList();
     }
 
-    List<Movie> findAll();
+    public Optional<Movie> findById(String id) {
+        String query = "from Movie where id = :id";
+        TypedQuery<Movie> typedQuery = entityManager.createQuery(query, Movie.class)
+                .setParameter("id", id);
 
-    default Optional<Movie> findById(String id) {
-        return findByAnd(x -> x.getId().equalsIgnoreCase(id)).findFirst();
+        return Optional.ofNullable(typedQuery.getSingleResult());
     }
 
-    default void deleteById(String id) throws BusinessException {
-        List<Movie> movies = findAll();
-        Movie movie = findByAnd(x -> x.getId().equalsIgnoreCase(id)).findFirst().orElseThrow(()-> new BusinessException(ErrorType.NOT_FOUND));
-        movies.remove(movie);
+    public List<Movie> findByDirectorAndName(String director, String name) {
+        if(director==null && name==null){
+            return findAll();
+        }
+        String query = null;
+        TypedQuery<Movie> typedQuery;
+        if(director==null){
+            query = "from Movie where name = :name";
+            typedQuery = entityManager.createQuery(query, Movie.class)
+                    .setParameter("name", name);
+
+        }else if(name ==null){
+            query = "from Movie where director = :director";
+            typedQuery = entityManager.createQuery(query, Movie.class)
+                    .setParameter("director", director);
+        }else{
+            query = "from Movie where director = :director and name = :name";
+            typedQuery = entityManager.createQuery(query, Movie.class)
+                    .setParameter("director", director).setParameter("name", name);
+
+        }
+
+
+        return typedQuery.getResultList();
     }
 
-    default List<Movie> findByDirectorAndName(String director, String name) {
-        return findBy(x -> (director==null|| x.getDirector().equalsIgnoreCase(director)) && (name==null || x.getName().equalsIgnoreCase(name)) );
+    @Transactional
+    public void deleteById(String id) {
+        String query = "delete from Movie where id = :id";
+        Query deleteQuery = entityManager.createQuery(query)
+                .setParameter("id", id);
+        deleteQuery.executeUpdate();
     }
 
-    default List<Movie> findByName(String name) {
-        return findBy(x -> x.getName().equalsIgnoreCase(name));
+    @Transactional
+    public void save(Movie movie) {
+        //entityManager.merge(movie);
+        entityManager.persist(movie);
     }
-
-    private List<Movie> findBy(Predicate<Movie> predicate) {
-        return findAll().stream().filter(predicate).collect(Collectors.toList());
-    }
-
-    private Stream<Movie> findByAnd(Predicate<Movie> predicate) {
-        return findAll().stream().filter(predicate);
-    }
-
 }
 

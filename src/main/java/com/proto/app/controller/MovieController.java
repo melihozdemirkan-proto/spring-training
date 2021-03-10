@@ -1,5 +1,6 @@
 package com.proto.app.controller;
 
+import com.proto.app.entity.Movie;
 import com.proto.app.exception.BusinessException;
 import com.proto.app.model.*;
 import com.proto.app.service.MovieService;
