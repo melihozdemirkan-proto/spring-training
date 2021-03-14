@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -83,15 +84,8 @@ public class MovieService {
     }
 
     private Movie checkIfMovieExists(String id) throws BusinessException {
-        Movie movie;
-        try {
-            movie = movieRepository.findById(id).get();
-        }catch (EmptyResultDataAccessException exception){
-            throw  new BusinessException(ErrorType.NOT_FOUND);
-        }
-        return movie;
+        return movieRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorType.NOT_FOUND));
     }
-
 
     private void printList() {
         System.out.println("-*-*-*-*-*-*-*-*-");

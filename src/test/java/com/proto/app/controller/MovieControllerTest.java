@@ -195,12 +195,10 @@ public class MovieControllerTest {
                         .header(HttpHeaders.CONTENT_TYPE, "application/json"))
                 .andDo(print())
                 .andExpect(status().isOk());
-        //get
 
+        //get
         String responseJson = mvc.perform(
-                get("/movies/?name=Kill Bill 3")
-                        .content(mapper.writeValueAsString(createMovieRequest))
-                        .header(HttpHeaders.CONTENT_TYPE, "application/json"))
+                get("/movies/?name=Kill Bill 3"))
                 .andDo(print())
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 

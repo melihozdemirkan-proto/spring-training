@@ -142,7 +142,7 @@ public class MovieServiceTest {
         //given
         UpdateMovieRequest updateMovieRequest = new UpdateMovieRequest("Hugo", "Scorsese", true);
         //when
-        when(movieRepository.findById(NA_ID)).thenThrow(new EmptyResultDataAccessException(1));
+        when(movieRepository.findById(NA_ID)).thenReturn(Optional.empty());
         //then
         BusinessException exception = assertThrows(BusinessException.class, ()->movieService.updateMovie(NA_ID, updateMovieRequest));
         assertEquals(ErrorType.NOT_FOUND, exception.getErrorType());
@@ -167,7 +167,7 @@ public class MovieServiceTest {
         //given
         PatchMovieRequest patchMovieRequest = new PatchMovieRequest(null,null, true);
         //when
-        when(movieRepository.findById(NA_ID)).thenThrow(new EmptyResultDataAccessException(1));
+        when(movieRepository.findById(NA_ID)).thenReturn(Optional.empty());
         //then
         BusinessException exception = assertThrows(BusinessException.class, ()->movieService.patchMovie(NA_ID, patchMovieRequest));
         assertEquals(ErrorType.NOT_FOUND, exception.getErrorType());
@@ -189,7 +189,7 @@ public class MovieServiceTest {
     public void deleteMovieReturnsNotFound() throws BusinessException {
         //given
         //when
-        when(movieRepository.findById(NA_ID)).thenThrow(new EmptyResultDataAccessException(1));
+        when(movieRepository.findById(NA_ID)).thenReturn(Optional.empty());
         //then
         BusinessException exception = assertThrows(BusinessException.class, ()->movieService.deleteMovie(NA_ID));
         assertEquals(ErrorType.NOT_FOUND, exception.getErrorType());
