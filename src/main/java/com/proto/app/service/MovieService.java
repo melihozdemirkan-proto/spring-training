@@ -9,9 +9,11 @@ import com.proto.app.model.UpdateMovieRequest;
 import com.proto.app.repository.MovieRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Scope;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.springframework.web.context.annotation.RequestScope;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -19,18 +21,22 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
+@RequestScope
 @RequiredArgsConstructor
 public class MovieService {
     @Value("${app.max-movie-per-director}")
     String maxMoviePerService;
     private final MovieRepository movieRepository;
+    private final LogService logService;
 
     public List<Movie> moviesByDirectorAndName(String director, String name) {
         return movieRepository.findByDirectorAndName(director, name);
     }
 
     public Optional<Movie> moviesById(String id) throws BusinessException {
+        logService.log("moviesById start");
         Movie movie = movieRepository.findById(id).orElseThrow(()->new BusinessException(ErrorType.NOT_FOUND));
+        logService.log("moviesById end");
 
         return Optional.ofNullable(movie);
     }

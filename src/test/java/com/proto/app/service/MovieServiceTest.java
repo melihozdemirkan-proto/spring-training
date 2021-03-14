@@ -34,6 +34,9 @@ public class MovieServiceTest {
     @Mock
     private MovieRepository movieRepository;
 
+    @Mock
+    private LogService logService;
+
     @BeforeEach
     public void init() {
         movieService.maxMoviePerService = "4";
